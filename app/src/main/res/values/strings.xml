@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">List ToDo</string>
+    <string name="login">Login</string>
+    <string name="cadastro">Cadastro</string>
+    <string name="e_mail">Insira seu E-mail</string>
+    <string name="senha">Insira sua Senha</string>
+    <string name="nome">Insira seu Nome</string>
+    <string name="click_login">Clique para fazer Login</string>
+    <string name="click_cadastro">Clique para fazer Cadastro</string>
+</resources>
