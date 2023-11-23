@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -27,7 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ListaToDo extends AppCompatActivity {
+public class ListaToDo extends AppCompatActivity implements OnDialogCloseListner {
 
     FirebaseAuth auth;
     Button button;
@@ -38,6 +41,8 @@ public class ListaToDo extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private ToDoAdapter adapter;
     private List<ToDoModel> mList;
+    private Query query;
+    private ListenerRegistration listenerRegistration;
 
 
     @Override
@@ -91,20 +96,27 @@ public class ListaToDo extends AppCompatActivity {
     }
 
     private void showData(){
-        firestore.collection("task").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        query = firestore.collection("task").orderBy("time", Query.Direction.DESCENDING);
+                listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentChange documentChange : value.getDocumentChanges()){
                     if (documentChange.getType()== DocumentChange.Type.ADDED){
                         String id = documentChange.getDocument().getId();
                         ToDoModel toDoModel = documentChange.getDocument().toObject(ToDoModel.class).withId(id);
-
                         mList.add(toDoModel);
                         adapter.notifyDataSetChanged();
                     }
                 }
-                Collections.reverse(mList);
+                listenerRegistration.remove();
             }
         });
+    }
+
+    @Override
+    public void onDialogClose(DialogInterface dialogInterface) {
+        mList.clear();
+        showData();
+        adapter.notifyDataSetChanged();
     }
 }

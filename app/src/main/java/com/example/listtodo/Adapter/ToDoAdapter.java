@@ -1,5 +1,6 @@
 package com.example.listtodo.Adapter;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.listtodo.AddNewTask;
 import com.example.listtodo.ListaToDo;
 import com.example.listtodo.MainActivity;
 import com.example.listtodo.Model.ToDoModel;
@@ -28,12 +30,34 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         this.todoList = todoList;
         listaToDo = lista;
     }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(listaToDo).inflate(R.layout.each_task, parent, false);
         firestore= FirebaseFirestore.getInstance();
+
         return new MyViewHolder(view);
+    }
+
+    public void deleteTask(int position){
+        ToDoModel toDoModel = todoList.get(position);
+        firestore.collection("task").document(toDoModel.TaskId).delete();
+        todoList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void editTask(int position){
+        ToDoModel toDoModel = todoList.get(position);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("task", toDoModel.getTask());
+        bundle.putString("due", toDoModel.getDue());
+        bundle.putString("id", toDoModel.TaskId);
+
+        AddNewTask addNewTask = new AddNewTask();
+        addNewTask.setArguments(bundle);
+        addNewTask.show(listaToDo.getSupportFragmentManager(), addNewTask.getTag());
     }
 
     @Override
