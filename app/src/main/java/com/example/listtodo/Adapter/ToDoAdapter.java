@@ -1,5 +1,6 @@
 package com.example.listtodo.Adapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,10 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         firestore.collection("task").document(toDoModel.TaskId).delete();
         todoList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public Context getContext(){
+        return  listaToDo;
     }
 
     public void editTask(int position){
